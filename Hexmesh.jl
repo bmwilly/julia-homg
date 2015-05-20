@@ -15,7 +15,7 @@ type Hexmesh
 	Xf # transform
 	# problem specific
 	coeff
-	
+
 	function Hexmesh(nelems::Any, X::Any)
 		mesh = new()
 		mesh.dim = length(nelems)
@@ -26,7 +26,7 @@ type Hexmesh
 		mesh.order=[]
 		return mesh
 	end
-end	
+end
 type C
 	num_nodes;
 	num_elements;
@@ -60,8 +60,8 @@ function plot(self)
 	# PyPlot.figure(1)
 	def_color = (31/256,171/256,226/256);   # default color of grid
 	lw = 1;                         # default line width of grid
-  
-	if (self.dim == 2 )      	
+
+	if (self.dim == 2 )
 	  	(x,y) = ndgrid(0:1/self.nelems[1]:1.0, 0:1/self.nelems[2]:1.0);
 	  	pts = [x[:] y[:]];
 	  	coords = self.Xf(pts);
@@ -79,7 +79,7 @@ function plot(self)
 	else
 	    # 2 xy planes
 	    (x,y) = ndgrid( 0:1/self.nelems[1]:1.0, 0:1/self.nelems[2]:1.0 );
-	    
+
 	    # z = 0
 	    z = zeros (size(x));
 	    pts = [x[:] y[:] z[:]];
@@ -94,8 +94,8 @@ function plot(self)
 	    y1 = reshape(coords[:,2], self.nelems[1]+1, self.nelems[2]+1);
 	    z1 = reshape(coords[:,3], self.nelems[1]+1, self.nelems[2]+1);
 
-	    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-"); 
-	    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k",  linestyle="-"); 
+	    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-");
+	    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k",  linestyle="-");
 	    # z = 1
 	    z = ones  (size(x));
 	    pts = [x[:] y[:] z[:]];
@@ -105,7 +105,7 @@ function plot(self)
 	    x1 = reshape(coords[:,1], self.nelems[1]+1, self.nelems[2]+1);
 	    y1 = reshape(coords[:,2], self.nelems[1]+1, self.nelems[2]+1);
 	    z1 = reshape(coords[:,3], self.nelems[1]+1, self.nelems[2]+1);
-	    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-"); 
+	    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-");
 	    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k", linestyle="-");
 	    #--------------------------------------------------------------------
 	    # 2 yz planes
@@ -119,8 +119,8 @@ function plot(self)
 	    x1 = reshape(coords[:,1], self.nelems[2]+1, self.nelems[3]+1);
 	    y1 = reshape(coords[:,2], self.nelems[2]+1, self.nelems[3]+1);
 	    z1 = reshape(coords[:,3], self.nelems[2]+1, self.nelems[3]+1);
-	    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-"); 
-	    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k",  linestyle="-"); 
+	    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-");
+	    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k",  linestyle="-");
 	    # x = 1
 	    x = ones (size(y));
 	    pts = [x[:] y[:] z[:]];
@@ -130,8 +130,8 @@ function plot(self)
 	    x1 = reshape(coords[:,1], self.nelems[2]+1, self.nelems[3]+1);
 	    y1 = reshape(coords[:,2], self.nelems[2]+1, self.nelems[3]+1);
 	    z1 = reshape(coords[:,3], self.nelems[2]+1, self.nelems[3]+1);
-	    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-"); 
-	    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k",  linestyle="-"); 
+	    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-");
+	    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k",  linestyle="-");
 	    #--------------------------------------------------------------------
 	    # 2 xz planes
 	    (x,z) = ndgrid( 0:1/self.nelems[1]:1.0, 0:1/self.nelems[3]:1.0 );
@@ -144,8 +144,8 @@ function plot(self)
 	    x1 = reshape(coords[:,1], self.nelems[1]+1, self.nelems[3]+1);
 	    y1 = reshape(coords[:,2], self.nelems[1]+1, self.nelems[3]+1);
 	    z1 = reshape(coords[:,3], self.nelems[1]+1, self.nelems[3]+1);
-	    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-"); 
-	    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k",  linestyle="-"); 
+	    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-");
+	    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k",  linestyle="-");
 	    # y = 1
 	    y = ones (size(x));
 	    pts = [x[:] y[:] z[:]];
@@ -155,10 +155,10 @@ function plot(self)
 	    x1 = reshape(coords[:,1], self.nelems[1]+1, self.nelems[3]+1);
 	    y1 = reshape(coords[:,2], self.nelems[1]+1, self.nelems[3]+1);
 	    z1 = reshape(coords[:,3], self.nelems[1]+1, self.nelems[3]+1);
-	    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-"); 
-	    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k",  linestyle="-"); 
-	    
-	    # pretty views etc 
+	    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-");
+	    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k",  linestyle="-");
+
+	    # pretty views etc
 	    # view(3); axis equal;
 	    # title(['Hex Mesh ' num2str(self.nelems[1]) 'x' num2str(self.nelems[2]) 'x' num2str(self.nelems[3])])
 	end
@@ -179,7 +179,7 @@ if (self.dim == 2 )
     coords = self.Xf(pts);
 
     ci = arrayfun( fx, coords[:,1], coords[:,2] );
-    # surf(reshape(coords[:,1], size(x)), ... 
+    # surf(reshape(coords[:,1], size(x)), ...
     #    reshape(coords[:,2], size(x)), ...
     #    zeros(size(x)), reshape(ci, size(x)), ...
     #    'EdgeColor','none','LineStyle','none' ...
@@ -192,8 +192,8 @@ if (self.dim == 2 )
     coords = self.Xf(pts);
     x = reshape(coords[:,1], self.nelems[1]+1, self.nelems[2]+1);
     y = reshape(coords[:,2], self.nelems[1]+1, self.nelems[2]+1);
-    PyPlot.plot(x,y, c="k", linestyle="-"); 
-    PyPlot.plot(x',y', c="k", linestyle="-"); 
+    PyPlot.plot(x,y, c="k", linestyle="-");
+    PyPlot.plot(x',y', c="k", linestyle="-");
 
     # axis square;
     # view(0,90);
@@ -209,7 +209,7 @@ else
     pts = [x[:] y[:] z[:]];
     coords = self.Xf(pts);
     ci = arrayfun( fx, coords[:,1], coords[:,2], coords[:,3] );
-    # surf(reshape(coords[:,1], size(x)), ... 
+    # surf(reshape(coords[:,1], size(x)), ...
     #    reshape(coords[:,2], size(x)), ...
     #    reshape(coords[:,3], size(x)), ...
     #    reshape(ci, size(x)), ...
@@ -225,8 +225,8 @@ else
     x1 = reshape(coords[:,1], self.nelems[1]+1, self.nelems[2]+1);
     y1 = reshape(coords[:,2], self.nelems[1]+1, self.nelems[2]+1);
     z1 = reshape(coords[:,3], self.nelems[1]+1, self.nelems[2]+1);
-    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-"); 
-    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k", linestyle="-"); 
+    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-");
+    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k", linestyle="-");
     # z = 1
     (x,y) = ndgrid( 0:1/(scl*self.nelems[1]):1.0, 0:1/(scl*self.nelems[2]):1.0 );
     z = ones  (size(x));
@@ -235,12 +235,12 @@ else
     ci = arrayfun( fx, coords[:,1], coords[:,2], coords[:,3] );
     PyPlot.surf(reshape(coords[:,1], size(x)), reshape(coords[:,2], size(x)), reshape(coords[:,3], size(x)), alpha=0.5);
 
-    # surf(reshape(coords[:,1], size(x)), ... 
+    # surf(reshape(coords[:,1], size(x)), ...
     #    reshape(coords[:,2], size(x)), ...
     #    reshape(coords[:,3], size(x)), ...
     #    reshape(ci, size(x)), ...
     #    'EdgeColor','none','LineStyle','none' ...
-    #     ); # 'FaceColor', 'interp', 'FaceLighting', 'phong' 
+    #     ); # 'FaceColor', 'interp', 'FaceLighting', 'phong'
     # hold on;
     (x,y) = ndgrid( 0:1/self.nelems[1]:1.0, 0:1/self.nelems[2]:1.0 );
     z = ones  (size(x));
@@ -249,8 +249,8 @@ else
     x1 = reshape(coords[:,1], self.nelems[1]+1, self.nelems[2]+1);
     y1 = reshape(coords[:,2], self.nelems[1]+1, self.nelems[2]+1);
     z1 = reshape(coords[:,3], self.nelems[1]+1, self.nelems[2]+1);
-    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-"); 
-    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k", linestyle="-"); 
+    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-");
+    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k", linestyle="-");
     #--------------------------------------------------------------------
     # 2 yz planes
     (y,z) = ndgrid( 0:1/(scl*self.nelems[2]):1.0, 0:1/(scl*self.nelems[3]):1.0 );
@@ -259,7 +259,7 @@ else
     pts = [x[:] y[:] z[:]];
     coords = self.Xf(pts);
     ci = arrayfun( fx, coords[:,1], coords[:,2], coords[:,3] );
-    # surf(reshape(coords[:,1], size(x)), ... 
+    # surf(reshape(coords[:,1], size(x)), ...
     #    reshape(coords[:,2], size(x)), ...
     #    reshape(coords[:,3], size(x)), ...
     #    reshape(ci, size(x)), ...
@@ -276,15 +276,15 @@ else
     x1 = reshape(coords[:,1], self.nelems[2]+1, self.nelems[3]+1);
     y1 = reshape(coords[:,2], self.nelems[2]+1, self.nelems[3]+1);
     z1 = reshape(coords[:,3], self.nelems[2]+1, self.nelems[3]+1);
-    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-"); 
-    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k", linestyle="-"); 
+    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-");
+    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k", linestyle="-");
     x = 1
     (y,z) = ndgrid( 0:1/(scl*self.nelems[2]):1.0, 0:1/(scl*self.nelems[3]):1.0 );
     x = ones (size(y));
     pts = [x[:] y[:] z[:]];
     coords = self.Xf(pts);
     ci = arrayfun( fx, coords[:,1], coords[:,2], coords[:,3] );
-    # surf(reshape(coords[:,1], size(x)), ... 
+    # surf(reshape(coords[:,1], size(x)), ...
     #    reshape(coords[:,2], size(x)), ...
     #    reshape(coords[:,3], size(x)), ...
     #    reshape(ci, size(x)), ...
@@ -300,8 +300,8 @@ else
     x1 = reshape(coords[:,1], self.nelems[2]+1, self.nelems[3]+1);
     y1 = reshape(coords[:,2], self.nelems[2]+1, self.nelems[3]+1);
     z1 = reshape(coords[:,3], self.nelems[2]+1, self.nelems[3]+1);
-    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-"); 
-    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k", linestyle="-"); 
+    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-");
+    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k", linestyle="-");
     #--------------------------------------------------------------------
     # 2 xz planes
     (x,z) = ndgrid( 0:1/(scl*self.nelems[1]):1.0, 0:1/(scl*self.nelems[3]):1.0 );
@@ -310,7 +310,7 @@ else
     pts = [x[:] y[:] z[:]];
     coords = self.Xf(pts);
     ci = arrayfun( fx, coords[:,1], coords[:,2], coords[:,3] );
-    # surf(reshape(coords[:,1], size(x)), ... 
+    # surf(reshape(coords[:,1], size(x)), ...
     #    reshape(coords[:,2], size(x)), ...
     #    reshape(coords[:,3], size(x)), ...
     #    reshape(ci, size(x)) ...
@@ -325,21 +325,21 @@ else
     x1 = reshape(coords[:,1], self.nelems[1]+1, self.nelems[3]+1);
     y1 = reshape(coords[:,2], self.nelems[1]+1, self.nelems[3]+1);
     z1 = reshape(coords[:,3], self.nelems[1]+1, self.nelems[3]+1);
-    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-"); 
-    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k", linestyle="-"); 
+    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-");
+    PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k", linestyle="-");
     # y = 1
     (x,z) = ndgrid( 0:1/(scl*self.nelems[1]):1.0, 0:1/(scl*self.nelems[3]):1.0 );
     y = ones (size(x));
     pts = [x[:] y[:] z[:]];
     coords = self.Xf(pts);
     ci = arrayfun( fx, coords[:,1], coords[:,2], coords[:,3] );
-    # surf(reshape(coords[:,1], size(x)), ... 
+    # surf(reshape(coords[:,1], size(x)), ...
     #    reshape(coords[:,2], size(x)), ...
     #    reshape(coords[:,3], size(x)), ...
     #    reshape(ci, size(x)) ...
     #    );
     PyPlot.surf(reshape(coords[:,1], size(x)), reshape(coords[:,2], size(x)), reshape(coords[:,3], size(x)), alpha=0.5);
-    
+
     # hold on;
     (x,z) = ndgrid( 0:1/self.nelems[1]:1.0, 0:1/self.nelems[3]:1.0 );
     y = ones (size(x));
@@ -348,10 +348,10 @@ else
     x1 = reshape(coords[:,1], self.nelems[1]+1, self.nelems[3]+1);
     y1 = reshape(coords[:,2], self.nelems[1]+1, self.nelems[3]+1);
     z1 = reshape(coords[:,3], self.nelems[1]+1, self.nelems[3]+1);
-    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-"); 
+    PyPlot.plot3D(x1[:],y1[:],z1[:], c="k", linestyle="-");
     PyPlot.plot3D(x1'[:],y1'[:],z1'[:], c="k", linestyle="-");
 
-    # pretty views etc 
+    # pretty views etc
     # view(3); axis square
     # view(150,40);
     # # colorbar;
@@ -377,7 +377,7 @@ end
 		else
 			self.coeff = coeff;
 		end
-	end	
+	end
 	function assemble_mass(self, order)
 		set_order(self, order);
 		# assemble the mass matrix
@@ -457,12 +457,14 @@ end
 			ind_inner = ind_inner1D + (order+1) * (ind_inner1D'-1);
 		else
 			ind_inner = ind_inner1D + (order+1) * (ind_inner1D'-1);
-			ind_inner = repmat(ind_inner, [1,1,order-1]);
+			# ind_inner = repmat(ind_inner, [1,1,order-1]);
+			ind_inner = repeat(ind_inner, outer = [1,1,order-1]);
 			for i = 1:order-1
-				ind_inner[:,:,i] = ind_inner[:,:,i] + i * (order+1)^2;
+				# ind_inner[:,:,i] = ind_inner[:,:,i] + i * (order+1)^2;
+				ind_inner[:,:,i] += i * (order+1)^2;
 			end
 		end
-		
+
 		# loop over elements
 		for e=1:ne
 			idx =  get_node_indices(self, e, order);
@@ -475,10 +477,10 @@ end
 			J[st:en] = ind2;
 			pts =  element_nodes(self, e, refel);
 			(detJac, Jac) = geometric_factors(self, refel, pts);
-			
+
 			eMat = element_mass(self, e, refel, detJac);
 			mass_val[st:en] = eMat[:];
-			
+
 			eMat = element_stiffness(self, e, refel, detJac, Jac);
 			stiff_val[st:en] = eMat[:];
 
@@ -497,8 +499,8 @@ end
 		# zero dirichlet bdy conditions
 		bdy = get_boundary_node_indices(self, order);
 		ii = ismember(I,bdy);
-		jj = ismember(J,bdy);		
-		
+		jj = ismember(J,bdy);
+
 		stiff_val = stiff_val.*(int(!bool(ii))).*(int(!bool(jj)));
 		inv_stiff_val = inv_stiff_val.*(int(!bool(ii))).*(int(!bool(jj)));
 
@@ -558,7 +560,7 @@ end
 			NP_f = (order+1)^self.dim;
 			dof_coarse = prod([self.nelems...] * self.order + 1);
 			dof_fine   = prod([self.nelems...] * order + 1);
-			Pe = refel.Pp; 
+			Pe = refel.Pp;
 		end
 		ne  = prod([self.nelems...]);
 		# storage for indices and values
@@ -588,7 +590,7 @@ end
 	end
 	function get_node_indices ( self, eid, order )
 		# determine global node indices for a given element
-		
+
 		if ( self.dim == 2)
 			(i,j) = ind2sub (self.nelems, eid);
 			i_low   = (i-1)*order + 1;   i_high =  i*order + 1;
@@ -661,14 +663,14 @@ end
 	end
 	function get_boundary_node_indices(self, order)
 		# function idx = get_boundary_node_indices(self, order)
-		#    returns indices of boundary nodes, for setting 
-		#    boundary conditions       
+		#    returns indices of boundary nodes, for setting
+		#    boundary conditions
 		if (self.dim == 2)
 			(x,y) = ndgrid(1:self.nelems[1]*order+1,1:self.nelems[2]*order+1);
 
 			idx = [ findin(x,1);findin(x,(self.nelems[1]*order+1));findin(y,1);findin(y,(self.nelems[2]*order+1))];
 			idx = unique(sort(idx));
-		else 
+		else
 			(x,y,z) = ndgrid(1:self.nelems[1]*order+1,1:self.nelems[2]*order+1,1:self.nelems[3]*order+1);
 
 			idx = [ findin(x,1); findin(x,(self.nelems[1]*order+1)); findin(y,1); findin(y,(self.nelems[2]*order+1)); findin(z,1); findin(z,(self.nelems[3]*order+1))];
@@ -679,13 +681,13 @@ end
 	end
 	function get_element_boundary_node_indices(self, order)
 		# function idx = get_element_boundary_node_indices(self, order)
-		#    returns indices of element boundary nodes, for block 
-		#    Jacobi smoother       
+		#    returns indices of element boundary nodes, for block
+		#    Jacobi smoother
 		if (self.dim == 2)
 			(x,y) = ndgrid(1:self.nelems[1]*order+1,1:self.nelems[2]*order+1);
 			idx = [ findin(mod(x,order),1);findin(mod(y,order),1);];
 			idx = unique(sort(idx));
-		else 
+		else
 			(x,y,z) = ndgrid(1:self.nelems[1]*order+1,1:self.nelems[2]*order+1,1:self.nelems[3]*order+1);
 
 			idx = [ findin(mod(x,order),1); findin(mod(y,order),1); findin(mod(z,order),1);];
@@ -696,7 +698,7 @@ end
 	end
 	function element_mass(self, eid, refel, J)
 		# element mass matrix
-		Md = refel.W .* J ; 
+		Md = refel.W .* J ;
 		Mds = Md[:,1]
 		Me = refel.Q' * diagm(Mds) * refel.Q;
 		return Me
@@ -743,8 +745,8 @@ end
 	function geometric_factors( self, refel, pts )
 		# change to using Qx etc ?
 		if (refel.dim == 1)
-			xr  = refel.Dg * pts; 
-			J = xr; 
+			xr  = refel.Dg * pts;
+			J = xr;
 		elseif (refel.dim == 2)
 			(xr, xs) = Tensor.grad2 (refel.Dg, pts[:,1]);
 			(yr, ys) = Tensor.grad2 (refel.Dg, pts[:,2]);
@@ -779,7 +781,7 @@ end
 		end
 		return J,D
 	end
-	function linear_element_nodes(self, elem, order) 
+	function linear_element_nodes(self, elem, order)
 
 		if (self.dim == 2)
 			(i,j) = ind2sub (self.nelems*order, elem);
@@ -828,8 +830,8 @@ end
 	function element_gauss(self, elem, refel)
 		# function pts = element_gauss(self, elem, refel)
 		# returns location of gauss coordinates of order
-		# for element 
-		if (self.order == refel.N) 
+		# for element
+		if (self.order == refel.N)
 			h = 1./[self.nelems...]';
 
 			if ( self.dim == 2)
@@ -850,7 +852,7 @@ end
 				pts = [x[:] y[:] z[:]];
 			end
 		else
-			assert(refel.N == 1); 
+			assert(refel.N == 1);
 			# ... get gll points ...
 			if (self.dim == 2)
 				(i,j) = ind2sub (tuple([self.nelems...]'*self.order), elem);
@@ -963,7 +965,7 @@ end
 	end
 
 	function getElementCenters(order, elems)
-		# order is ignored ... 
+		# order is ignored ...
 		nodes = linspace(0,1, elems+1);
 		coords = 1/2*(nodes[1:end-1] + nodes[2:end]);
 	end
@@ -971,7 +973,7 @@ end
 	function stats(nelems, order)
 		# function Ch = stats(nelems, order)
 		#   given number of elements and the order,
-		#   this function calculates different node 
+		#   this function calculates different node
 		#   stats for the mesh
 		C=Mesh.C();
 		d               = length(nelems);
@@ -984,12 +986,12 @@ end
 
 		C.nnz = (order+2)^d*C.num_nodes;
 		#       if (d == 2)
-		#         
+		#
 		#       else
-		#         
+		#
 		#       end
 		return C
-	end	
+	end
 	function ndgrid_fill(a, v, s, snext)
 		for j = 1:length(a)
 			a[j] = v[div(rem(j-1, snext), s)+1]

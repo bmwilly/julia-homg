@@ -64,6 +64,7 @@ type Refel
 		p_p_1d = transpose (elem.Vr \ Vpp);
 		elem.W = zeros(elem.Nrp^elem.dim, 1);
 		elem.Wgll = zeros(elem.Nrp^elem.dim, 1);
+		elem.Wfgll = zeros(elem.Nrp^(elem.dim-1), 1);
 
 		if (d == 2)
 			elem.Q = kron(q1d, q1d) ;
