@@ -4,39 +4,39 @@ include("Refel.jl")
 include("Basis.jl")
 include("Tensor.jl")
 include("BaseCustom.jl")
-include("HexMesh.jl")
+include("Hexmesh.jl")
 
 type Grid
 	level
     is_finest
     eig_max
     eig_min
-    
+
     k_evec
-    
+
     jacobi_omega
     jacobi_invdiag
     jacobi_inv_block_diag
-    
+
     ssor_M
     ssor_N
     sor_omega
-    
+
     smoother
     linear_smoother
     K
     L
     K_lin
     Boundary
-    
+
     M
-    
+
     R
     P
-    
+
     Mesh
-    
-    Coarse  # handle to coarse grid 
+
+    Coarse  # handle to coarse grid
 
 	function Grid(mesh, order, coarse=[])
 		grid = new()
@@ -50,7 +50,7 @@ type Grid
 
 		grid.Mesh = mesh;
 
-		Mesh.set_order(mesh, order); 
+		Mesh.set_order(mesh, order);
 		grid.sor_omega = 1;
 		if typeof(coarse) == Grid
 			grid.P = Mesh.assemble_interpolation(grid.Coarse.Mesh, order);
@@ -76,7 +76,7 @@ end
 function assemble_poisson(grid, mu)
 	# fine grid material props ...
 	Mesh.set_coeff (grid.Mesh, mu) ;
-	# assemble for this level ... 
+	# assemble for this level ...
 	(grid.K, grid.M, grid.jacobi_inv_block_diag) = Mesh.assemble_poisson(grid.Mesh, grid.Mesh.order);
 	# syms x y z
 	if ( grid.Mesh.dim == 2 )
@@ -107,7 +107,7 @@ function assemble_poisson(grid, mu)
 						1./mu3[1:2:end, 1:2:end, 2:2:end] + 1./mu3[2:2:end, 1:2:end, 2:2:end] +
 						1./mu3[1:2:end, 2:2:end, 2:2:end] + 1./mu3[2:2:end, 2:2:end, 2:2:end] );
 				else
-					mu_coarse = 0.125*(mu3[1:2:end, 1:2:end, 1:2:end] + mu3[2:2:end, 1:2:end, 1:2:end] + mu3[1:2:end, 2:2:end, 1:2:end] + mu3[2:2:end, 2:2:end, 1:2:end] + 
+					mu_coarse = 0.125*(mu3[1:2:end, 1:2:end, 1:2:end] + mu3[2:2:end, 1:2:end, 1:2:end] + mu3[1:2:end, 2:2:end, 1:2:end] + mu3[2:2:end, 2:2:end, 1:2:end] +
 						mu3[1:2:end, 1:2:end, 2:2:end] + mu3[2:2:end, 1:2:end, 2:2:end] + mu3[1:2:end, 2:2:end, 2:2:end] + mu3[2:2:end, 2:2:end, 2:2:end] );
 				end
 			end
@@ -115,7 +115,7 @@ function assemble_poisson(grid, mu)
 		else
 			assemble_poisson(grid.Coarse, mu) ;
 		end
-	end      
+	end
 end
 
 function use_linearized_smoothers(grid)
@@ -132,7 +132,7 @@ end
 
 # compute the residual
 function residual(grid, rhs, u)
-	
+
 	if typeof(rhs) == Nothing && typeof(u) == Nothing
 		rhs = grid.L;
 	end
@@ -142,7 +142,7 @@ function residual(grid, rhs, u)
 
 	r = grid.K*u - rhs;
 	return r
-	
+
 end
 
 function solve_pcg(grid, num_vcyc, smoother, v1, v2, rhs, u)
@@ -171,7 +171,7 @@ function solve_pcg(grid, num_vcyc, smoother, v1, v2, rhs, u)
 		end
 
 		# precondition ..
-		rho = zeros(size(u)); 
+		rho = zeros(size(u));
 		rho = vcycle(grid, v1, v2, r, rho);
 
 		beta = dot(rho[:], r[:]) / rho_res ;
@@ -241,19 +241,19 @@ end # v-cycle
 # smoothers
 function smooth(grid, v, rhs, u)
 	if grid.smoother == "jacobi"
-		u = smoother_jacobi(grid, v, rhs, u); 
+		u = smoother_jacobi(grid, v, rhs, u);
 		return u;
 	elseif grid.smoother == "blk_jac"
-		u = smoother_block_jacobi(grid, v, rhs, u); 
+		u = smoother_block_jacobi(grid, v, rhs, u);
 		return u;
-	elseif grid.smoother == "chebyshev" 
-		u = smoother_chebyshev(grid, v, rhs, u); 
+	elseif grid.smoother == "chebyshev"
+		u = smoother_chebyshev(grid, v, rhs, u);
 		return u;
 	elseif grid.smoother == "ssor"
 		u = smoother_sym_sor(grid, v, rhs, u);
 		return u;
 	else
-		display("ERROR: Unrecognized smoother type"); 
+		display("ERROR: Unrecognized smoother type");
 		return;
 	end
 end
@@ -282,7 +282,7 @@ function smoother_jacobi (grid, v, rhs, u)
 	for i=1:v
 		res  = grid.jacobi_invdiag .* residual(grid, rhs, u);
 		u = u - grid.jacobi_omega.*res;
-	end  
+	end
 	return u
 end # jacobi
 
@@ -295,7 +295,7 @@ function smoother_block_jacobi (grid, v, rhs, u)
 	for i=1:v
 		res  = grid.jacobi_inv_block_diag * residual(grid, rhs, u);
 		u = u - grid.jacobi_omega.*res;
-	end  
+	end
 	return u
 end # blk jacobi
 
@@ -328,8 +328,8 @@ function smoother_chebyshev (grid, v, rhs, u)
 		grid.jacobi_invdiag = 1./D;
 		Kc = spdiagm(grid.jacobi_invdiag,[0],length(D), length(D)) * grid.K;
 		opts.tol = 0.01;
-		grid.eig_max = eigs(Kc, 1, which="LM", opts);  
-		# grid.eig_min = eigs(Kc, 1, 'sm');  
+		grid.eig_max = eigs(Kc, 1, which="LM", opts);
+		# grid.eig_min = eigs(Kc, 1, 'sm');
 	end
 
 	# adjust the eigenvalues to hit the upper spectrum
@@ -361,7 +361,7 @@ function smoother_chebyshev (grid, v, rhs, u)
 end # chebyshev
 
 function get_eigenvectors(grid)
-  # generate the correct matrix 
+  # generate the correct matrix
   Kc = grid.K; #(eye(size(grid.K)) - grid.ZeroBoundary) + grid.ZeroBoundary * grid.K * grid.ZeroBoundary;
   (evec, eval) = svd(full(Kc)); #eig(full(Kc), full(grid.M));
   (eval,per)= sort(diag(eval)); #'ascend'
@@ -409,20 +409,7 @@ function spdiagm{T<:Integer}(B, d::Array{T, 1}, m::Integer, n::Integer)
 		i += numel
 	end
 	return sparse(I, J, V, m, n)
-end 
+end
 =#
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
