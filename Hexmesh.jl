@@ -432,7 +432,7 @@ end
 			pts =  element_nodes(self, e, refel);
 			(detJac, Jac) = geometric_factors(self, refel, pts);
 			eMat = element_stiffness(self, e, refel, detJac, Jac);
-			stiff_val[st:en] = eM[:];
+			stiff_val[st:en] = eMat[:];
 		end
 #		return K
 	end
@@ -489,7 +489,7 @@ end
 
 			eMat_inv[ind_inner[:],ind_inner[:]] =  eMat_inner_inv;
 			inv_stiff_val[st:en] = eMat_inv[:];
-			end
+		end
 
 		Iv=int64(I[:]);
 		Jv=int64(J[:]);
@@ -519,7 +519,7 @@ end
 		iKebdry = diag(full(iK[ebdy,ebdy]),0)
 		if countnz(iKebdry) > 0
       	iK[ebdy,ebdy] = diagm(1./iKebdry)
-	    end
+	  end
 		return K, M, iK
 	end
 	function assemble_rhs(self, fx, order)
