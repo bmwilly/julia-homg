@@ -6,6 +6,7 @@ include("Tensor.jl")
 include("BaseCustom.jl")
 
 import PyPlot
+using Distances
 export set_coeff
 
 type Hexmesh
@@ -434,7 +435,7 @@ end
 			eMat = element_stiffness(self, e, refel, detJac, Jac);
 			stiff_val[st:en] = eMat[:];
 		end
-#		return K
+		return K
 	end
 	function assemble_poisson(self, order)
 		set_order(self,order);
@@ -482,6 +483,93 @@ end
 			mass_val[st:en] = eMat[:];
 
 			eMat = element_stiffness(self, e, refel, detJac, Jac);
+			stiff_val[st:en] = eMat[:];
+
+			eMat_inner_inv = inv(eMat[ind_inner[:],ind_inner[:]]);
+			eMat_inv = diagm(diag(eMat,0));
+
+			eMat_inv[ind_inner[:],ind_inner[:]] =  eMat_inner_inv;
+			inv_stiff_val[st:en] = eMat_inv[:];
+		end
+
+		Iv=int64(I[:]);
+		Jv=int64(J[:]);
+		mv=mass_val[:];
+
+		M = sparse(Iv,Jv,mv,dof,dof);
+		# zero dirichlet bdy conditions
+		bdy = get_boundary_node_indices(self, order);
+		ii = ismember(I,bdy);
+		jj = ismember(J,bdy);
+
+		stiff_val = stiff_val.*(int(!bool(ii))).*(int(!bool(jj)));
+		inv_stiff_val = inv_stiff_val.*(int(!bool(ii))).*(int(!bool(jj)));
+
+		I = [I; bdy];
+		J = [J; bdy];
+		stiff_val = [stiff_val; ones(length(bdy), 1)];
+		inv_stiff_val = [inv_stiff_val; ones(length(bdy), 1)];
+		Iv=int64(I[:]);
+		Jv=int64(J[:]);
+		sv=stiff_val[:];
+		isv=inv_stiff_val[:];
+
+		K = sparse(Iv,Jv,sv,dof,dof);
+		iK = sparse(Iv,Jv,isv,dof,dof);
+		ebdy = get_element_boundary_node_indices(self, order);
+		iKebdry = diag(full(iK[ebdy,ebdy]),0)
+		if countnz(iKebdry) > 0
+      	iK[ebdy,ebdy] = diagm(1./iKebdry)
+	  end
+		return K, M, iK
+	end
+	function assemble_poisson_brinkman(self, order, centers)
+		set_order(self,order);
+		# assemble the mass matrix
+		refel = Refel( self.dim, order );
+		dof = prod([self.nelems...]*order + 1);
+		ne = prod([self.nelems...]);
+		# storage for indices and values
+		NP = (order+1)^self.dim;
+		NPNP = NP * NP;
+
+		I = zeros(ne * NPNP, 1);
+		J = zeros(ne * NPNP, 1);
+		mass_val = zeros(ne * NPNP, 1);
+		stiff_val = zeros(ne * NPNP, 1);
+		inv_stiff_val = zeros(ne * NPNP, 1);
+		ind_inner1D = repmat((2:order), 1, order-1);
+		if self.dim == 2
+
+			ind_inner = ind_inner1D + (order+1) * (ind_inner1D'-1);
+		else
+			ind_inner = ind_inner1D + (order+1) * (ind_inner1D'-1);
+			# ind_inner = repmat(ind_inner, [1,1,order-1]);
+			ind_inner = repeat(ind_inner, outer = [1,1,order-1]);
+			for i = 1:order-1
+				# ind_inner[:,:,i] = ind_inner[:,:,i] + i * (order+1)^2;
+				ind_inner[:,:,i] += i * (order+1)^2;
+			end
+		end
+
+		# loop over elements
+		for e=1:ne
+			idx =  get_node_indices(self, e, order);
+			ind1 = repmat(idx,NP,1);
+			ind2 = reshape(repmat(idx',NP,1),NPNP,1);
+			st = (e-1)*NPNP+1;
+			en = e*NPNP;
+
+			I[st:en] = ind1;
+			J[st:en] = ind2;
+			pts =  element_nodes(self, e, refel);
+			(detJac, Jac) = geometric_factors(self, refel, pts);
+			brinkman_pts = brinkman_tensor(pts, centers);
+
+			eMat = element_mass_brinkman(self, e, refel, detJac, brinkman_pts);
+			mass_val[st:en] = eMat[:];
+
+			eMat = element_stiffness_brinkman(self, e, refel, detJac, Jac, brinkman_pts);
 			stiff_val[st:en] = eMat[:];
 
 			eMat_inner_inv = inv(eMat[ind_inner[:],ind_inner[:]]);
@@ -703,6 +791,24 @@ end
 		Me = refel.Q' * diagm(Mds) * refel.Q;
 		return Me
 	end
+	function element_mass_brinkman(self, eid, refel, J, brinkman_pts)
+		# element mass matrix for brinkman
+		Md = refel.W .* J .* brinkman_pts;
+		Mds = Md[:,1]
+		Me = refel.Q' * diagm(Mds) * refel.Q;
+		return Me
+	end
+	function brinkman_tensor(pts, centers)
+		npts = length(pts[:,1]); nc = length(centers[:,1])
+		brinkman_pts = ones(npts)
+
+		# get euclidean distances between nodal points and centers of brinkman obstacles
+		R = pairwise(Euclidean(), pts', centers')
+		R = minimum(R, 2)
+		brinkman_pts[find(R .< 0.05)] = 1e6 
+		brinkman_pts
+	end
+
 
 	function element_stiffness(self, eid, r, J, D)
 		# element mass matrix
@@ -742,6 +848,12 @@ end
 		end
 		return Ke
 	end
+	function element_stiffness_brinkman(self, eid, r, J, D, brinkman_pts)
+		eMass = element_mass_brinkman(self, eid, r, J, brinkman_pts)
+		eStiff = element_stiffness(self, eid, r, J, D)
+		return eStiff + eMass
+	end
+
 	function geometric_factors( self, refel, pts )
 		# change to using Qx etc ?
 		if (refel.dim == 1)
